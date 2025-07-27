@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQ Next Word Predictor</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      /* Light theme variables */
+      --primary-color: #4CAF50;
+      --secondary-color: #2196F3;
+      --accent-color: #FF9800;
+      --background-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --border-color: #e0e0e0;
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      --hero-gradient: linear-gradient(135deg, #e3f2fd, #fce4ec);
+      --transition: all 0.3s ease-in-out;
+    }
+
+    [data-theme="dark"] {
+      /* Dark theme variables */
+      --primary-color: #66BB6A;
+      --secondary-color: #42A5F5;
+      --accent-color: #FFA726;
+      --background-color: #121212;
+      --card-bg: #1e1e1e;
+      --text-color: #f5f5f5;
+      --text-secondary: #b0b0b0;
+      --border-color: #333333;
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      --hero-gradient: linear-gradient(135deg, #0a2540, #2a0a40);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      transition: var(--transition);
+      line-height: 1.6;
+    }
+
+    /* Header Styles */
+    header {
+      background-color: var(--card-bg);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .logo i {
+      font-size: 1.8rem;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-color);
+      font-weight: 600;
+      position: relative;
+      padding: 0.5rem 0;
+      transition: var(--transition);
+    }
+
+    .nav-links a:hover {
+      color: var(--primary-color);
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 3px;
+      background-color: var(--primary-color);
+      transition: var(--transition);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-color);
+      transition: var(--transition);
+    }
+
+    .theme-toggle:hover {
+      transform: rotate(20deg);
+      color: var(--accent-color);
+    }
+
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-color);
+      cursor: pointer;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: var(--hero-gradient);
+      padding: 5rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') no-repeat center center;
+      background-size: cover;
+      opacity: 0.15;
+    }
+
+    .hero-content {
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-color);
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: var(--text-color);
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      background-color: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+      border: none;
+      cursor: pointer;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    }
+
+    /* Features Section */
+    .features {
+      padding: 5rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 3rem;
+      font-size: 2.5rem;
+      color: var(--text-color);
+    }
+
+    .section-title span {
+      color: var(--primary-color);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .feature-card {
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      border: 1px solid var(--border-color);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Prediction Section */
+    .prediction {
+      padding: 5rem 2rem;
+      background-color: var(--background-color);
+    }
+
+    .prediction-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      padding: 3rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+    }
+
+    .prediction-container h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2.2rem;
+      color: var(--text-color);
+    }
+
+    .prediction-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .input-group {
+      position: relative;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      font-size: 1.1rem;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      transition: var(--transition);
+    }
+
+    .input-group input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+      outline: none;
+    }
+
+    .submit-button {
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    }
+
+    .submit-button:hover {
+      background-color: #3d8b40;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    }
+
+    .result {
+      margin-top: 2rem;
+      background-color: rgba(0, 188, 212, 0.1);
+      border-left: 5px solid var(--secondary-color);
+      border-radius: 10px;
+      padding: 1.5rem;
+      color: var(--text-color);
+      font-size: 1.1rem;
+      transition: var(--transition);
+      display: none;
+    }
+
+    .result ul {
+      margin-top: 1rem;
+      padding-left: 1.5rem;
+    }
+
+    .result li {
+      margin-bottom: 0.5rem;
+    }
+
+.prediction-text {
+    background-color: rgba(76, 175, 80, 0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border-left: 3px solid var(--primary-color);
+}
+
+.confidence-scores {
+    margin-top: 1rem;
+}
+
+.confidence-scores ul {
+    margin-top: 0.5rem;
+}
+
+    /* About Section */
+    .about {
+      padding: 5rem 2rem;
+      background-color: var(--card-bg);
+    }
+
+    .about-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .about-text h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .about-text p {
+      margin-bottom: 1.5rem;
+      color: var(--text-secondary);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .stat-card {
+      background-color: var(--background-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .about-image {
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      height: 400px;
+      background: url('https://cdn.analyticsvidhya.com/wp-content/uploads/2021/08/77308shutterstock-1208129407_trm5.960.jpg') no-repeat center center;
+      background-size: cover;
+    }
+
+    /* Contact Section */
+    .contact {
+      padding: 5rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .contact-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      padding: 3rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+    }
+
+    .contact-info h3 {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-color);
+    }
+
+    .contact-detail {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .contact-icon {
+      width: 50px;
+      height: 50px;
+      background-color: rgba(76, 175, 80, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--primary-color);
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      padding: 0.8rem 1rem;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      transition: var(--transition);
+    }
+
+    .form-group textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+      outline: none;
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--card-bg);
+      padding: 3rem 2rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 3rem;
+    }
+
+    .footer-logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+
+    .footer-links h4 {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-color);
+    }
+
+    .footer-links ul {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 0.8rem;
+    }
+
+    .footer-links a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+
+    .footer-links a:hover {
+      color: var(--primary-color);
+    }
+
+    .social-links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .social-links a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      transition: var(--transition);
+    }
+
+    .social-links a:hover {
+      background-color: var(--primary-color);
+      color: white;
+      transform: translateY(-3px);
+    }
+
+    .copyright {
+      text-align: center;
+      padding-top: 2rem;
+      margin-top: 2rem;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+      .hero h1 {
+        font-size: 2.8rem;
+      }
+      
+      .about-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .contact-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background-color: var(--card-bg);
+        flex-direction: column;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+      }
+      
+      .nav-links.active {
+        display: flex;
+      }
+      
+      .hamburger {
+        display: block;
+      }
+      
+      .hero h1 {
+        font-size: 2.3rem;
+      }
+      
+      .section-title {
+        font-size: 2rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .hero {
+        padding: 3rem 1.5rem;
+      }
+      
+      .hero h1 {
+        font-size: 2rem;
+      }
+      
+      .prediction-container,
+      .contact-container {
+        padding: 2rem;
+      }
+      
+      .stats {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="nav-container">
+      <a href="#" class="logo">
+        <i class="fas fa-brain"></i>
+        <span>Word-Predictor</span>
+      </a>
+      
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#predict">Predict</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      
+      <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+      </button>
+      
+      <button class="hamburger" id="hamburger">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <h1>Intelligent Next Word Prediction</h1>
+      <p>Powered by advanced AI algorithms to enhance your typing experience and predict the next word in your sentences with remarkable accuracy.</p>
+      <a href="#predict" class="cta-button">Try It Now</a>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <h2 class="section-title">Amazing <span>Features</span></h2>
+    
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-bolt"></i>
+        </div>
+        <h3>Lightning Fast</h3>
+        <p>Our predictor works in real-time, offering suggestions as you type without any noticeable delay.</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-robot"></i>
+        </div>
+        <h3>AI-Powered</h3>
+        <p>Built using an LSTM model trained on around 5,000 text samples — not a huge dataset, but enough to explore and learn how text prediction works.</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-sync-alt"></i>
+        </div>
+        <h3>Context Aware</h3>
+        <p>Understands the context of your sentence to provide the most relevant predictions.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Prediction Section -->
+  <section class="prediction" id="predict">
+    <div class="prediction-container">
+      <h2>🧠 Next Word Predictor</h2>
+      
+      <form class="prediction-form" method="POST" onsubmit="return false;">
+        <div class="input-group">
+          <input type="text" name="user_input" placeholder="Start typing a sentence..." required>
+        </div>
+        
+        <button type="submit" class="submit-button">🔮 Predict Next Words</button>
+      </form>
+      
+      <div class="result" id="predictionResult">
+        {% if prediction %}
+          {{ prediction|safe }}
+        {% else %}
+          <p><strong>Prediction Results:</strong></p>
+          <p>The model predicts the following words might come next:</p>
+          <ul>
+            <li><strong>Question</strong> (probability: 42%)</li>
+            <li><strong>Answer</strong> (probability: 35%)</li>
+            <li><strong>Problem</strong> (probability: 15%)</li>
+            <li><strong>Solution</strong> (probability: 8%)</li>
+          </ul>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="about" id="about">
+    <div class="about-content">
+      <div class="about-text">
+        <h2>About Our Technology</h2>
+        <p>Our next word predictor uses advanced natural language processing techniques to analyze text patterns and predict the most likely next words in a sequence.</p>
+        <p>Built on transformer-based architectures similar to those used in cutting-edge language models, our system understands context, grammar, and semantics to deliver accurate predictions.</p>
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-number">96.62%</div>
+            <div>Accuracy</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">5k+</div>
+            <div>Words Processed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">0.2s</div>
+            <div>Avg. Response</div>
+          </div>
+        </div>
+      </div>
+      <div class="about-image"></div>
+    </div>
+  </section>
+  <!-- Contact Section -->
+  <section class="contact" id="contact">
+    <h2 class="section-title">Contact <span>Us</span></h2>
+    
+    <div class="contact-container">
+      <div class="contact-info">
+        <h3>Get In Touch</h3>
+        
+        <div class="contact-detail">
+          <div class="contact-icon">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <div>
+            <h4>Location</h4>
+            <p>Bhubneswar,Odisha</p>
+          </div>
+        </div>
+        
+        <div class="contact-detail">
+          <div class="contact-icon">
+            <i class="fas fa-phone"></i>
+          </div>
+          <div>
+            <h4>Phone</h4>
+            <p>+918018333413</p>
+          </div>
+        </div>
+        
+        <div class="contact-detail">
+          <div class="contact-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div>
+            <h4>Email</h4>
+            <p>prahalladnayak873@gmail.com</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="contact-form">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" placeholder="Enter your name">
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="Enter your email">
+        </div>
+        
+        <div class="form-group">
+          <label for="message">Your Message</label>
+          <textarea id="message" placeholder="Type your message here"></textarea>
+        </div>
+        
+        <button type="submit" class="submit-button">Send Message</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-container">
+      <div>
+        <div class="footer-logo">
+          <i class="fas fa-brain"></i>Next_Word Predictor
+        </div>
+        <p>Advanced AI for next word prediction in Word contexts. Enhancing user experience one word at a time.</p>
+        <div class="social-links">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+      
+      <div class="footer-links">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#predict">Predict</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-links">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">kaggle</a></li>
+          <li><a href="#">Tutorials</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Support</a></li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="copyright">
+      <p>&copy; 2025 Word Predictor. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = themeToggle.querySelector('i');
+    const body = document.body;
+    
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      body.setAttribute('data-theme', savedTheme);
+      themeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = body.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      body.setAttribute('data-theme', newTheme);
+      themeIcon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+      
+      // Save preference
+      localStorage.setItem('theme', newTheme);
+    });
+    
+    // Mobile Navigation
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.querySelector('.nav-links');
+    
+    hamburger.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+    
+    // Smooth Scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+        
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 70,
+            behavior: 'smooth'
+          });
+          
+          // Close mobile menu if open
+          navLinks.classList.remove('active');
+        }
+      });
+    });
+    
+    // Form submission simulation
+    const predictionForm = document.querySelector('.prediction-form');
+    const resultSection = document.getElementById('predictionResult');
+    
+predictionForm.addEventListener('submit', async (e) => {
+    e.preventDefault(); // This stops the page from reloading
+    
+    // Show loading state
+    const submitButton = predictionForm.querySelector('.submit-button');
+    const originalText = submitButton.innerHTML;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Predicting...';
+    submitButton.disabled = true;
+    
+    // Get the form data
+    const formData = new FormData(predictionForm);
+    
+    try {
+        // Send the data to Flask
+        const response = await fetch('/predict', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) throw new Error('Prediction failed');
+        
+        // Get the HTML response
+        const resultHTML = await response.text();
+        
+        // Update the result section
+        resultSection.innerHTML = resultHTML;
+        resultSection.style.display = 'block';
+        
+    } catch (error) {
+        resultSection.innerHTML = '<p style="color:red;">Error in prediction. Please try again.</p>';
+        resultSection.style.display = 'block';
+    } finally {
+        // Reset button
+        submitButton.innerHTML = originalText;
+        submitButton.disabled = false;
+    }
+});
+    
+    // Show result section if prediction exists on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      if (resultSection.innerHTML.trim() !== '') {
+        resultSection.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
